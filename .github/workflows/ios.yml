@@ -26,7 +26,16 @@ jobs:
           npx cap add ios
           npx cap sync ios
 
-      - name: Compiler l'app (non signée)
+      - name: Ajouter les permissions (Info.plist)
+        run: |
+          PLIST=ios/App/App/Info.plist
+          /usr/libexec/PlistBuddy -c "Add :NSLocationWhenInUseUsageDescription string Votre position sert à calculer un itinéraire et à trouver les arrêts proches. Elle reste sur votre appareil." "$PLIST" || true
+          /usr/libexec/PlistBuddy -c "Add :LSApplicationQueriesSchemes array" "$PLIST" || true
+          /usr/libexec/PlistBuddy -c "Add :LSApplicationQueriesSchemes:0 string comgooglemaps" "$PLIST" || true
+          /usr/libexec/PlistBuddy -c "Add :LSApplicationQueriesSchemes:1 string waze" "$PLIST" || true
+          /usr/libexec/PlistBuddy -c "Print :NSLocationWhenInUseUsageDescription" "$PLIST"
+
+      - name: Compiler l'app
         run: |
           xcodebuild \
             -workspace ios/App/App.xcworkspace \
