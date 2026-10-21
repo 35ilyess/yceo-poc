@@ -1,0 +1,52 @@
+name: Build iOS IPA (unsigned)
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Installer les dépendances
+        run: npm install
+
+      - name: Build web (Angular + PWA)
+        run: npm run build
+
+      - name: Générer le projet iOS
+        run: |
+          npx cap add ios
+          npx cap sync ios
+
+      - name: Compiler l'app (non signée)
+        run: |
+          xcodebuild \
+            -workspace ios/App/App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath ios/build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            build
+
+      - name: Empaqueter le .ipa
+        run: |
+          cd ios/build/Build/Products/Release-iphoneos
+          mkdir -p Payload
+          cp -R App.app Payload/
+          zip -r YceoPOC-unsigned.ipa Payload >/dev/null
+
+      - name: Publier le .ipa
+        uses: actions/upload-artifact@v4
+        with:
+          name: YceoPOC-unsigned-ipa
+          path: ios/build/Build/Products/Release-iphoneos/YceoPOC-unsigned.ipa
+          if-no-files-found: error
