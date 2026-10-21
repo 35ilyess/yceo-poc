@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="legende" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 40.38 40.87">
+  <defs>
+    <style>
+      .st0 { fill: #fff; }
+      .st1 { fill: #831f82; }
+    </style>
+  </defs>
+  <rect class="st1" x="1.08" y="1.32" width="38.23" height="38.23" rx="13" ry="13"/>
+  <path class="st0" d="M21.84,26.06h-8.01v-3.01l4.99-10.3h4.45l-4.65,9.49h3.22v-2.8h4.24v9.33h-4.24v-2.72h0Z"/>
+</svg>

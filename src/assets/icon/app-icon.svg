@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Ycéo POC">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#00c2d1" />
+      <stop offset="1" stop-color="#005872" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)" />
+  <!-- épingle de localisation + trajet -->
+  <g fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M168 150 C168 112 198 86 236 86 C274 86 304 112 304 150 C304 196 236 268 236 268 C236 268 168 196 168 150 Z"
+      fill="#ffffff" stroke="none" />
+    <circle cx="236" cy="150" r="30" fill="#005872" stroke="none" />
+    <path d="M176 330 q80 -26 160 0 t0 86" stroke-width="26" stroke-dasharray="4 46" />
+    <circle cx="336" cy="416" r="20" fill="#ffffff" stroke="none" />
+  </g>
+</svg>

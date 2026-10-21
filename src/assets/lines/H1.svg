@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="legende" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 40.38 40.87">
+  <defs>
+    <style>
+      .st0 { fill: #fff; }
+      .st1 { fill: #e4003a; }
+    </style>
+  </defs>
+  <path class="st1" d="M19.51,1.33C9.15,1.69,1.08,10.52,1.08,20.89v16.85c0,.99.81,1.8,1.8,1.8h17.31c10.55,0,19.11-8.55,19.11-19.11S30.38.95,19.51,1.33Z"/>
+  <g>
+    <path class="st0" d="M11.83,30.13h-4.34v-15.91h4.34v5.52h5.98v-5.52h4.35v15.91h-4.35v-6.41h-5.98v6.41Z"/>
+    <path class="st0" d="M30.87,30.13h-4.35v-11.99h-2.38v-3.92h6.72v15.91h.01Z"/>
+  </g>
+</svg>

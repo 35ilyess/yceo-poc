@@ -1,0 +1,45 @@
+{
+  "name": "yceo-poc",
+  "version": "0.1.0",
+  "private": true,
+  "description": "POC d'application de transport (clean-room) pour le reseau Yceo / STRAN Saint-Nazaire. Inspire de l'architecture STAR Rennes : Ionic + Angular + Capacitor, donnees ouvertes Opendatasoft + API Navitia.",
+  "scripts": {
+    "start": "ng serve --host 0.0.0.0 --port 4200",
+    "build": "ng build",
+    "sync": "cap sync"
+  },
+  "dependencies": {
+    "@angular/animations": "18.2.0",
+    "@angular/common": "18.2.0",
+    "@angular/compiler": "18.2.0",
+    "@angular/core": "18.2.0",
+    "@angular/forms": "18.2.0",
+    "@angular/platform-browser": "18.2.0",
+    "@angular/platform-browser-dynamic": "18.2.0",
+    "@angular/router": "18.2.0",
+    "@angular/service-worker": "^18.2.0",
+    "@capacitor/app": "6.0.1",
+    "@capacitor/core": "6.1.2",
+    "@capacitor/geolocation": "^6.1.1",
+    "@capacitor/haptics": "6.0.1",
+    "@capacitor/keyboard": "6.0.2",
+    "@capacitor/share": "^6.0.4",
+    "@capacitor/splash-screen": "^6.0.4",
+    "@capacitor/status-bar": "6.0.1",
+    "@ionic/angular": "8.2.6",
+    "ionicons": "7.4.0",
+    "leaflet": "1.9.4",
+    "maplibre-gl": "^4.7.1",
+    "rxjs": "7.8.1",
+    "tslib": "2.6.3",
+    "zone.js": "0.14.10"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "18.2.0",
+    "@angular/cli": "18.2.0",
+    "@angular/compiler-cli": "18.2.0",
+    "@capacitor/cli": "6.1.2",
+    "@types/leaflet": "1.9.12",
+    "typescript": "5.5.4"
+  }
+}

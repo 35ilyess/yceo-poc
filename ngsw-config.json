@@ -1,0 +1,43 @@
+{
+  "$schema": "./node_modules/@angular/service-worker/config/schema.json",
+  "index": "/index.html",
+  "assetGroups": [
+    {
+      "name": "app",
+      "installMode": "prefetch",
+      "updateMode": "prefetch",
+      "resources": {
+        "files": ["/favicon.ico", "/index.html", "/manifest.webmanifest", "/*.css", "/*.js"]
+      }
+    },
+    {
+      "name": "assets",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "resources": {
+        "files": ["/assets/**", "/*.(svg|woff2|png|jpg|webp)"]
+      }
+    }
+  ],
+  "dataGroups": [
+    {
+      "name": "gtfs-data",
+      "urls": ["/assets/gtfs/**", "/assets/services.json", "/assets/pmr.json", "/assets/trafic.json"],
+      "cacheConfig": {
+        "strategy": "performance",
+        "maxSize": 2000,
+        "maxAge": "30d"
+      }
+    },
+    {
+      "name": "geocoder",
+      "urls": ["https://data.geopf.fr/geocodage/**"],
+      "cacheConfig": {
+        "strategy": "freshness",
+        "maxSize": 100,
+        "maxAge": "1d",
+        "timeout": "3s"
+      }
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "name": "Ycéo — Saint-Nazaire (POC)",
+  "short_name": "Ycéo POC",
+  "description": "Itinéraires, lignes, horaires et plan du réseau Ycéo de Saint-Nazaire Agglomération. POC non officiel sur données ouvertes.",
+  "lang": "fr",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#005872",
+  "theme_color": "#005872",
+  "categories": ["travel", "navigation"],
+  "icons": [
+    {
+      "src": "assets/icon/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

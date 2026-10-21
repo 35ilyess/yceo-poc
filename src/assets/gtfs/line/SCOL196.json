@@ -1,0 +1,1 @@
+{"id":"SCOL196","short":"241","long":"SCO 241","color":"888888","text":"FFFFFF","directions":[{"dir":0,"term":"Sacré Cœur","stops":["22229","22231","22178"],"trips":[{"s":"SCOL1","t":[27540,27600,28800]}]},{"dir":1,"term":"Guilloterie","stops":["22178","22232","22230"],"trips":[{"s":"SCOL3","t":[44400,45600,45660]},{"s":"SCOL2","t":[59700,60900,60960]}]}]}
