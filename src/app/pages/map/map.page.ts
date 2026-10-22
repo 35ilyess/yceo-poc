@@ -120,10 +120,16 @@ function hasWebGL(): boolean {
       </div>
 
       <div class="legend" *ngIf="!loading && !journey">
-        <span class="dot" [style.background]="legendDotColor"></span>{{ stopCount }} arrêts
-        <span class="sep" *ngIf="allMode">· plan du réseau</span>
-        <span class="sep" *ngIf="!allMode && filter.size">· {{ filterLabel }}</span>
-        <span class="sep" *ngIf="!allMode && !filter.size">· choisissez une ligne</span>
+        <ng-container *ngIf="serviceCount !== null; else stopsLegend">
+          <span class="dot" [style.background]="layers.has('parkings') ? '#2a6fdb' : 'var(--yceo-primary)'"></span>
+          {{ serviceCount }} {{ layers.has('parkings') ? 'parkings relais' : 'points de vente' }}
+        </ng-container>
+        <ng-template #stopsLegend>
+          <span class="dot" [style.background]="legendDotColor"></span>{{ stopCount }} arrêts
+          <span class="sep" *ngIf="allMode">· plan du réseau</span>
+          <span class="sep" *ngIf="!allMode && filter.size">· {{ filterLabel }}</span>
+          <span class="sep" *ngIf="!allMode && !filter.size">· choisissez une ligne</span>
+        </ng-template>
       </div>
       <div class="legend loading" *ngIf="loading">
         <ion-spinner name="dots"></ion-spinner>&nbsp;Chargement…
@@ -310,6 +316,7 @@ export class MapPage implements OnInit, OnDestroy {
   private services?: ServicesData;
   private lJourney?: L.LayerGroup;
   private lServices?: L.LayerGroup;
+  private mlSaleMarkers: maplibregl.Marker[] = [];
   private ready = false;
   private pendingAt: [number, number] | null = null;
   journey: Journey | null = null;
@@ -342,7 +349,12 @@ export class MapPage implements OnInit, OnDestroy {
       this.pendingApplied = false;
       this.journey = p.get('journey') ? this.store.shown : null;
       const layer = p.get('layer') as Layer | null;
-      if (layer === 'parkings' || layer === 'sales') this.layers.add(layer);
+      if (layer === 'parkings' || layer === 'sales') {
+        this.layers = new Set([layer]);
+        this.allMode = false;
+        this.filter.clear();
+        this.singleLine = null;
+      }
       const at = p.get('at')?.split(',').map(Number);
       this.pendingAt = at && at.length === 2 && at.every(isFinite) ? [at[0], at[1]] : null;
       this.applyParams();
@@ -396,20 +408,47 @@ export class MapPage implements OnInit, OnDestroy {
     return this.singleLine ? '#' + this.singleLine.color : 'var(--yceo-primary)';
   }
 
+  /** Calque de services actif seul (parkings/ventes) : masque lignes & arrêts. */
+  get serviceCount(): number | null {
+    if (this.allMode || this.filter.size || this.layers.size !== 1) return null;
+    const d = this.services;
+    if (!d) return 0;
+    return this.layers.has('parkings') ? d.parkings.length : d.sales.length;
+  }
+
   toggleAll(): void {
     this.allMode = !this.allMode;
     this.filter.clear();
     this.singleLine = null;
+    this.layers.clear();
     this.applyFilter();
+    this.drawServices();
   }
 
   toggle(short: string): void {
     this.allMode = false;
+    this.layers.clear();
     if (this.filter.has(short)) this.filter.delete(short);
     else this.filter.add(short);
     this.singleLine =
       this.filter.size === 1 ? this.filterable.find((l) => l.short === [...this.filter][0]) ?? null : null;
     this.applyFilter();
+    this.drawServices();
+  }
+
+  /** Parkings / Ventes : exclusif, masque le reste (comme sélectionner une ligne). */
+  toggleLayer(l: Layer): void {
+    if (this.layers.has(l) && this.layers.size === 1) {
+      this.layers.clear();
+      this.allMode = true;
+    } else {
+      this.layers = new Set([l]);
+      this.allMode = false;
+    }
+    this.filter.clear();
+    this.singleLine = null;
+    this.applyFilter();
+    this.drawServices();
   }
 
   /** Arrêts à dessiner, colorés et dédupliqués (1 par arrêt). */
@@ -518,7 +557,7 @@ export class MapPage implements OnInit, OnDestroy {
       this.singleLine = null;
       this.applyFilter();
     } else {
-      if (!this.pendingLine && !this.allMode && !this.filter.size) {
+      if (!this.pendingLine && !this.allMode && !this.filter.size && !this.layers.size) {
         this.allMode = true;
         this.applyFilter();
       }
@@ -539,12 +578,6 @@ export class MapPage implements OnInit, OnDestroy {
   exitJourney(): void {
     this.store.shown = null;
     this.router.navigate(['/map']);
-  }
-
-  toggleLayer(l: Layer): void {
-    if (this.layers.has(l)) this.layers.delete(l);
-    else this.layers.add(l);
-    this.drawServices();
   }
 
   private journeyFC(): any {
@@ -654,6 +687,7 @@ export class MapPage implements OnInit, OnDestroy {
           type: 'Feature',
           geometry: { type: 'Point', coordinates: [p.lon, p.lat] },
           properties: {
+            type: 'parking',
             color: '#2a6fdb',
             html:
               `<b>${esc(name)}</b><br>${p.capacity} places · ${p.free ? 'gratuit' : 'payant ou non renseigné'}` +
@@ -668,6 +702,7 @@ export class MapPage implements OnInit, OnDestroy {
           type: 'Feature',
           geometry: { type: 'Point', coordinates: [s.lon, s.lat] },
           properties: {
+            type: 'sale',
             color: '#f39200',
             html: `<b>${esc(s.name)}</b><br>${esc(s.address)}, ${esc(s.city)}<br><small>${esc(s.products)}</small>`,
           },
@@ -677,22 +712,54 @@ export class MapPage implements OnInit, OnDestroy {
     return { type: 'FeatureCollection', features };
   }
 
+  /** Pastille blanche ronde avec le logo Ycéo (points de vente). */
+  private saleMarkerHtml(size = 26, img = 18): string {
+    return (
+      `<span style="display:grid;place-items:center;width:${size}px;height:${size}px;border-radius:50%;` +
+      `background:#fff;box-shadow:0 1px 5px rgba(0,0,0,.35)">` +
+      `<img src="assets/icon/yceo-mark.png" alt="" style="width:${img}px;height:${img}px"></span>`
+    );
+  }
+
   private drawServices(): void {
     const fc = this.servicesFC();
-    (this.mlMap?.getSource('services') as maplibregl.GeoJSONSource | undefined)?.setData(fc);
+    // --- MapLibre ---
+    (this.mlMap?.getSource('services') as maplibregl.GeoJSONSource | undefined)?.setData(fc); // parkings (cercles)
+    if (this.mlMap) {
+      this.mlSaleMarkers.forEach((m) => m.remove());
+      this.mlSaleMarkers = [];
+      for (const f of fc.features) {
+        if (f.properties.type !== 'sale') continue;
+        const [lon, lat] = f.geometry.coordinates;
+        const el = document.createElement('div');
+        el.style.cursor = 'pointer';
+        el.innerHTML = this.saleMarkerHtml();
+        const m = new maplibregl.Marker({ element: el })
+          .setLngLat([lon, lat])
+          .setPopup(new maplibregl.Popup({ offset: 16 }).setHTML(f.properties.html))
+          .addTo(this.mlMap);
+        this.mlSaleMarkers.push(m);
+      }
+    }
+    // --- Leaflet ---
     if (this.lServices) {
       this.lServices.clearLayers();
       for (const f of fc.features) {
         const [lon, lat] = f.geometry.coordinates;
-        L.circleMarker([lat, lon], {
-          radius: 8,
-          color: '#ffffff',
-          weight: 3,
-          fillColor: f.properties.color,
-          fillOpacity: 1,
-        })
-          .bindPopup(f.properties.html)
-          .addTo(this.lServices);
+        if (f.properties.type === 'sale') {
+          const icon = L.divIcon({ className: '', html: this.saleMarkerHtml(), iconSize: [26, 26], iconAnchor: [13, 13] });
+          L.marker([lat, lon], { icon }).bindPopup(f.properties.html).addTo(this.lServices);
+        } else {
+          L.circleMarker([lat, lon], {
+            radius: 8,
+            color: '#ffffff',
+            weight: 3,
+            fillColor: f.properties.color,
+            fillOpacity: 1,
+          })
+            .bindPopup(f.properties.html)
+            .addTo(this.lServices);
+        }
       }
     }
   }
@@ -792,6 +859,7 @@ export class MapPage implements OnInit, OnDestroy {
           id: 'services',
           type: 'circle',
           source: 'services',
+          filter: ['==', ['get', 'type'], 'parking'], // les ventes sont des markers logo
           paint: {
             'circle-radius': 8,
             'circle-color': ['get', 'color'],
@@ -888,6 +956,7 @@ export class MapPage implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.mlSaleMarkers.forEach((m) => m.remove());
     this.mlMap?.remove();
     this.lMap?.remove();
   }
