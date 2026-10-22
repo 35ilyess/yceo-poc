@@ -32,7 +32,7 @@ export class ThemeService {
     const root = document.documentElement;
     if (mode === 'auto') root.removeAttribute('data-theme');
     else root.setAttribute('data-theme', mode);
-    const dark = this.isDark(mode);
+    const dark = this.isDarkFor(mode);
     const meta = document.querySelector('meta[name="theme-color"]');
     meta?.setAttribute('content', dark ? '#0e1b1d' : '#005872');
     if (Capacitor.isNativePlatform()) {
@@ -45,8 +45,18 @@ export class ThemeService {
     this.apply(mode);
   }
 
+  /** État sombre affiché par le switch (forcé, ou auto + système sombre). */
+  get isDark(): boolean {
+    return this.isDarkFor(this.mode);
+  }
+
+  /** Switch « Mode sombre » : bascule en clair/sombre explicite. */
+  toggleDark(on: boolean): void {
+    this.set(on ? 'dark' : 'light');
+  }
+
   /** Sombre effectif : forcé, ou auto + système sombre. */
-  private isDark(mode: ThemeMode): boolean {
+  private isDarkFor(mode: ThemeMode): boolean {
     if (mode === 'dark') return true;
     if (mode === 'light') return false;
     return window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;

@@ -10,14 +10,13 @@ import {
   IonItem,
   IonLabel,
   IonNote,
-  IonSegment,
-  IonSegmentButton,
+  IonToggle,
   IonText,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { chevronForward, shieldCheckmarkOutline } from 'ionicons/icons';
+import { chevronForward, moonOutline, shieldCheckmarkOutline } from 'ionicons/icons';
 import { ConfigService } from '../../core/config.service';
-import { ThemeMode, ThemeService } from '../../core/theme.service';
+import { ThemeService } from '../../core/theme.service';
 import { NfcService } from '../../core/nfc.service';
 
 @Component({
@@ -34,25 +33,20 @@ import { NfcService } from '../../core/nfc.service';
     IonItem,
     IonLabel,
     IonNote,
-    IonSegment,
-    IonSegmentButton,
+    IonToggle,
     IonText,
   ],
-  styles: [`.hint{display:block;margin:6px 2px 0;font-size:0.8rem}`],
   template: `
     <ion-header class="ion-no-border">
       <ion-toolbar><ion-title>Réglages</ion-title></ion-toolbar>
     </ion-header>
     <ion-content class="ion-padding">
       <ion-text color="medium"><h3>Apparence</h3></ion-text>
-      <ion-segment [value]="theme.mode" (ionChange)="setTheme($any($event.detail.value))">
-        <ion-segment-button value="auto"><ion-label>Auto</ion-label></ion-segment-button>
-        <ion-segment-button value="light"><ion-label>Clair</ion-label></ion-segment-button>
-        <ion-segment-button value="dark"><ion-label>Sombre</ion-label></ion-segment-button>
-      </ion-segment>
-      <ion-note color="medium" class="hint">
-        « Auto » suit le réglage de ton téléphone.
-      </ion-note>
+      <ion-item lines="full">
+        <ion-icon name="moon-outline" slot="start" color="primary"></ion-icon>
+        <ion-label>Mode sombre</ion-label>
+        <ion-toggle slot="end" [checked]="theme.isDark" (ionChange)="theme.toggleDark($any($event.detail.checked))"></ion-toggle>
+      </ion-item>
 
       <hr />
       <ion-text color="medium">
@@ -93,13 +87,9 @@ export class SettingsPage {
   theme = inject(ThemeService);
   private nfc = inject(NfcService);
 
-  setTheme(mode: ThemeMode): void {
-    this.theme.set(mode);
-  }
-
   nfcState = this.nfc.isAvailable() ? 'disponible' : 'indisponible (POC web)';
 
   constructor() {
-    addIcons({ chevronForward, shieldCheckmarkOutline });
+    addIcons({ chevronForward, moonOutline, shieldCheckmarkOutline });
   }
 }
