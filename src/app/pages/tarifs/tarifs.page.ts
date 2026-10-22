@@ -61,7 +61,6 @@ type Bucket = 'titres' | 'abos';
             <div class="row" *ngFor="let t of g.items">
               <span class="t-txt">
                 <b>{{ t.name }}</b>
-                <small *ngIf="t.condition">{{ t.condition }}</small>
               </span>
               <span class="price" *ngIf="t.price != null">{{ fmt(t.price) }}</span>
             </div>
