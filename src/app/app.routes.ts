@@ -50,6 +50,10 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/search/search.page').then((m) => m.SearchPage),
       },
       {
+        path: 'tarifs',
+        loadComponent: () => import('./pages/tarifs/tarifs.page').then((m) => m.TarifsPage),
+      },
+      {
         path: 'services',
         loadComponent: () => import('./pages/services/services.page').then((m) => m.ServicesPage),
       },

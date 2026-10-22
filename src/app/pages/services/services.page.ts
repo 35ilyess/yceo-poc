@@ -84,7 +84,7 @@ type Tab = 'parkings' | 'sales';
           <p class="intro muted">Achetez vos tickets et recharges chez les dépositaires du réseau.</p>
           <div class="card item" *ngFor="let s of sales">
             <div class="ihead">
-              <span class="ico sale"><ion-icon name="ticket-outline"></ion-icon></span>
+              <span class="ico sale"><img src="assets/icon/yceo-mark.png" alt="Ycéo" /></span>
               <div class="itxt">
                 <b>{{ s.name }}</b>
                 <small>{{ s.address }}, {{ s.city }}<span *ngIf="dist(s) as d"> · {{ d }}</span></small>
@@ -135,7 +135,13 @@ type Tab = 'parkings' | 'sales';
         background: #2a6fdb;
       }
       .ico.sale {
-        background: var(--yceo-orange, #f39200);
+        background: #fff;
+        border-radius: 50%;
+        box-shadow: inset 0 0 0 1px var(--yceo-border);
+      }
+      .ico.sale img {
+        width: 26px;
+        height: 26px;
       }
       .itxt {
         display: flex;

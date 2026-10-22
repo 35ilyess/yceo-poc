@@ -168,10 +168,10 @@ import { LineBadgeComponent } from '../../shared/line-badge.component';
             <span class="lbl">Plan du réseau</span>
             <span class="sub">Arrêts & tracés</span>
           </a>
-          <a class="service" href="https://www.yceo-mobilite.fr/mes-titres-et-tarifs/" target="_blank" rel="noopener">
+          <a class="service" routerLink="/tarifs">
             <span class="ic"><ion-icon name="ticket-outline"></ion-icon></span>
             <span class="lbl">Titres & tarifs</span>
-            <span class="sub">Boutique</span>
+            <span class="sub">Prix & où acheter</span>
           </a>
           <a class="service" href="https://www.yceo-mobilite.fr/velyceo/" target="_blank" rel="noopener">
             <span class="ic"><ion-icon name="bicycle-outline"></ion-icon></span>

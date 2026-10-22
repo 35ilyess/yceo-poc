@@ -49,20 +49,24 @@ import {
     `
       ion-tab-bar {
         --background: var(--yceo-card);
-        --border: 1px solid var(--yceo-border);
-        height: 60px;
-        padding-top: 4px;
+        --border: 0;
+        height: 54px;
+        padding-top: 3px;
+        border-radius: 20px 20px 0 0;
+        border-top: 1px solid var(--yceo-border);
+        overflow: hidden;
+        box-shadow: 0 -4px 18px rgba(15, 42, 45, 0.08);
       }
       ion-tab-button {
         --color: var(--yceo-muted);
         --color-selected: var(--yceo-primary);
       }
       ion-label {
-        font-size: 0.72rem;
+        font-size: 0.7rem;
         font-weight: 600;
       }
       ion-icon {
-        font-size: 1.4rem;
+        font-size: 1.3rem;
       }
     `,
   ],
