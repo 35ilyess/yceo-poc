@@ -35,9 +35,9 @@
               }
             ],
             "styles": [
-              "src/global.scss",
               "node_modules/leaflet/dist/leaflet.css",
-              "node_modules/maplibre-gl/dist/maplibre-gl.css"
+              "node_modules/maplibre-gl/dist/maplibre-gl.css",
+              "src/global.scss"
             ],
             "scripts": [],
             "allowedCommonJsDependencies": [

@@ -285,3 +285,61 @@ ion-action-sheet .action-sheet-button {
 ion-action-sheet .action-sheet-cancel {
   color: var(--yceo-muted);
 }
+
+/* ---- Popups carte (Leaflet + MapLibre) : suivent le thème ---- */
+.leaflet-popup-content-wrapper,
+.maplibregl-popup-content {
+  background: var(--yceo-card);
+  color: var(--yceo-ink);
+  border-radius: 12px;
+  box-shadow: var(--yceo-shadow-lg);
+  font-family: var(--ion-font-family);
+  font-size: 0.86rem;
+}
+.leaflet-popup-content {
+  margin: 10px 14px;
+}
+.leaflet-popup-content small,
+.maplibregl-popup-content small {
+  color: var(--yceo-muted);
+}
+.leaflet-popup-tip {
+  background: var(--yceo-card);
+}
+.leaflet-popup-close-button,
+.maplibregl-popup-close-button {
+  color: var(--yceo-muted);
+}
+/* pointe MapLibre (une couleur par ancrage) */
+.maplibregl-popup-anchor-top .maplibregl-popup-tip,
+.maplibregl-popup-anchor-top-left .maplibregl-popup-tip,
+.maplibregl-popup-anchor-top-right .maplibregl-popup-tip {
+  border-bottom-color: var(--yceo-card);
+}
+.maplibregl-popup-anchor-bottom .maplibregl-popup-tip,
+.maplibregl-popup-anchor-bottom-left .maplibregl-popup-tip,
+.maplibregl-popup-anchor-bottom-right .maplibregl-popup-tip {
+  border-top-color: var(--yceo-card);
+}
+.maplibregl-popup-anchor-left .maplibregl-popup-tip {
+  border-right-color: var(--yceo-card);
+}
+.maplibregl-popup-anchor-right .maplibregl-popup-tip {
+  border-left-color: var(--yceo-card);
+}
+/* bouton « S'y rendre » dans la popup */
+.yceo-go {
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: var(--yceo-primary);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.82rem;
+  padding: 7px 13px;
+  border-radius: 999px;
+  cursor: pointer;
+}

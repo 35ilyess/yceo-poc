@@ -343,6 +343,7 @@ export class MapPage implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    document.addEventListener('click', this.onGoClick);
     // La page est conservée par les onglets Ionic : on réagit à chaque changement de paramètres.
     this.route.queryParamMap.subscribe((p) => {
       this.pendingLine = p.get('line');
@@ -677,6 +678,14 @@ export class MapPage implements OnInit, OnDestroy {
     }
   }
 
+  /** Bouton « S'y rendre » (itinéraire vers ce lieu) injecté dans la popup. */
+  private goBtn(name: string, lat: number, lon: number): string {
+    return (
+      `<button class="yceo-go" data-name="${esc(name)}" data-lat="${lat}" data-lon="${lon}">` +
+      `➜ S'y rendre</button>`
+    );
+  }
+
   private servicesFC(): any {
     const features: any[] = [];
     const d = this.services;
@@ -691,7 +700,8 @@ export class MapPage implements OnInit, OnDestroy {
             color: '#2a6fdb',
             html:
               `<b>${esc(name)}</b><br>${p.capacity} places · ${p.free ? 'gratuit' : 'payant ou non renseigné'}` +
-              `<br>🚏 ${esc(p.stop)} à ${p.stopDist} m`,
+              `<br>🚏 ${esc(p.stop)} à ${p.stopDist} m` +
+              this.goBtn(name, p.lat, p.lon),
           },
         });
       }
@@ -704,7 +714,9 @@ export class MapPage implements OnInit, OnDestroy {
           properties: {
             type: 'sale',
             color: '#f39200',
-            html: `<b>${esc(s.name)}</b><br>${esc(s.address)}, ${esc(s.city)}<br><small>${esc(s.products)}</small>`,
+            html:
+              `<b>${esc(s.name)}</b><br>${esc(s.address)}, ${esc(s.city)}<br><small>${esc(s.products)}</small>` +
+              this.goBtn(s.name, s.lat, s.lon),
           },
         });
       }
@@ -712,8 +724,23 @@ export class MapPage implements OnInit, OnDestroy {
     return { type: 'FeatureCollection', features };
   }
 
+  /** Clic sur « S'y rendre » dans une popup (HTML injecté hors Angular). */
+  private onGoClick = (e: Event): void => {
+    const btn = (e.target as HTMLElement)?.closest?.('.yceo-go') as HTMLElement | null;
+    if (!btn) return;
+    const lat = parseFloat(btn.dataset['lat'] ?? '');
+    const lon = parseFloat(btn.dataset['lon'] ?? '');
+    const name = btn.dataset['name'] || 'Destination';
+    if (!isFinite(lat) || !isFinite(lon)) return;
+    this.zone.run(() => {
+      this.store.pendingFrom = null;
+      this.store.pendingTo = { kind: 'address', name, lat, lon };
+      this.router.navigate(['/journey']);
+    });
+  };
+
   /** Pastille blanche ronde avec le logo Ycéo (points de vente). */
-  private saleMarkerHtml(size = 26, img = 18): string {
+  private saleMarkerHtml(size = 22, img = 15): string {
     return (
       `<span style="display:grid;place-items:center;width:${size}px;height:${size}px;border-radius:50%;` +
       `background:#fff;box-shadow:0 1px 5px rgba(0,0,0,.35)">` +
@@ -747,7 +774,7 @@ export class MapPage implements OnInit, OnDestroy {
       for (const f of fc.features) {
         const [lon, lat] = f.geometry.coordinates;
         if (f.properties.type === 'sale') {
-          const icon = L.divIcon({ className: '', html: this.saleMarkerHtml(), iconSize: [26, 26], iconAnchor: [13, 13] });
+          const icon = L.divIcon({ className: '', html: this.saleMarkerHtml(), iconSize: [22, 22], iconAnchor: [11, 11] });
           L.marker([lat, lon], { icon }).bindPopup(f.properties.html).addTo(this.lServices);
         } else {
           L.circleMarker([lat, lon], {
@@ -956,6 +983,7 @@ export class MapPage implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    document.removeEventListener('click', this.onGoClick);
     this.mlSaleMarkers.forEach((m) => m.remove());
     this.mlMap?.remove();
     this.lMap?.remove();
