@@ -11,8 +11,10 @@ import {
   IonToolbar,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { mapOutline, openOutline, pricetagsOutline } from 'ionicons/icons';
-import { TarifsData, TarifsService } from '../../core/tarifs.service';
+import { cardOutline, mapOutline, openOutline, ticketOutline } from 'ionicons/icons';
+import { TarifGroup, TarifsData, TarifsService } from '../../core/tarifs.service';
+
+type Bucket = 'titres' | 'abos';
 
 /** Titres & tarifs du réseau Ycéo (open data) + accès aux points de vente. */
 @Component({
@@ -28,6 +30,7 @@ import { TarifsData, TarifsService } from '../../core/tarifs.service';
     </ion-header>
     <ion-content>
       <div class="body" *ngIf="data">
+        <!-- Où acheter -->
         <button class="card cta" (click)="onMap()">
           <span class="dot"><img src="assets/icon/yceo-mark.png" alt="" /></span>
           <span class="cta-txt">
@@ -37,7 +40,22 @@ import { TarifsData, TarifsService } from '../../core/tarifs.service';
           <ion-icon name="map-outline"></ion-icon>
         </button>
 
-        <ng-container *ngFor="let g of data.groups">
+        <!-- 2 gros boutons : Titres / Abonnements -->
+        <div class="tiles">
+          <button class="tile" [class.on]="bucket === 'titres'" (click)="bucket = 'titres'" [attr.aria-pressed]="bucket === 'titres'">
+            <span class="ic"><ion-icon name="ticket-outline"></ion-icon></span>
+            <span class="lbl">Titres</span>
+            <span class="sub">dès {{ minPrice(titres) }}</span>
+          </button>
+          <button class="tile" [class.on]="bucket === 'abos'" (click)="bucket = 'abos'" [attr.aria-pressed]="bucket === 'abos'">
+            <span class="ic"><ion-icon name="card-outline"></ion-icon></span>
+            <span class="lbl">Abonnements</span>
+            <span class="sub">dès {{ minPrice(abos) }}</span>
+          </button>
+        </div>
+
+        <!-- Détail du choix -->
+        <ng-container *ngFor="let g of shown">
           <h3 class="sec">{{ g.category }}</h3>
           <div class="card list">
             <div class="row" *ngFor="let t of g.items">
@@ -100,6 +118,54 @@ import { TarifsData, TarifsService } from '../../core/tarifs.service';
         flex: none;
         font-size: 1.3rem;
         color: var(--yceo-primary-dark);
+      }
+      .tiles {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin: 16px 0 2px;
+      }
+      .tile {
+        background: var(--yceo-card);
+        border: 1px solid var(--yceo-border);
+        border-radius: 16px;
+        box-shadow: var(--yceo-shadow);
+        padding: 16px 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        font: inherit;
+        color: var(--yceo-ink);
+        cursor: pointer;
+      }
+      .tile.on {
+        outline: 2px solid var(--yceo-primary);
+        border-color: transparent;
+      }
+      .tile .ic {
+        width: 46px;
+        height: 46px;
+        border-radius: 13px;
+        background: var(--yceo-tile);
+        color: var(--yceo-primary-dark);
+        display: grid;
+        place-items: center;
+      }
+      .tile.on .ic {
+        background: var(--yceo-primary);
+        color: #fff;
+      }
+      .tile .ic ion-icon {
+        font-size: 1.5rem;
+      }
+      .tile .lbl {
+        font-weight: 700;
+        font-size: 0.98rem;
+      }
+      .tile .sub {
+        font-size: 0.78rem;
+        color: var(--yceo-muted);
       }
       .sec {
         margin: 20px 2px 8px;
@@ -165,10 +231,27 @@ export class TarifsPage {
   private svc = inject(TarifsService);
   private router = inject(Router);
   data?: TarifsData;
+  bucket: Bucket = 'titres';
 
   constructor() {
-    addIcons({ mapOutline, openOutline, pricetagsOutline });
+    addIcons({ cardOutline, mapOutline, openOutline, ticketOutline });
     this.svc.get().subscribe((d) => (this.data = d));
+  }
+
+  get titres(): TarifGroup[] {
+    return (this.data?.groups ?? []).filter((g) => g.category !== 'Abonnements');
+  }
+  get abos(): TarifGroup[] {
+    return (this.data?.groups ?? []).filter((g) => g.category === 'Abonnements');
+  }
+  get shown(): TarifGroup[] {
+    return this.bucket === 'titres' ? this.titres : this.abos;
+  }
+
+  /** Prix minimum d'un ensemble de groupes, formaté. */
+  minPrice(groups: TarifGroup[]): string {
+    const prices = groups.flatMap((g) => g.items.map((i) => i.price)).filter((p): p is number => p != null);
+    return prices.length ? this.fmt(Math.min(...prices)) : '—';
   }
 
   fmt(p: number): string {

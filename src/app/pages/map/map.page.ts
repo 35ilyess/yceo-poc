@@ -104,7 +104,7 @@ function hasWebGL(): boolean {
             aria-label="Afficher les points de vente"
             (click)="toggleLayer('sales')"
           >
-            <span class="pv">€</span> Ventes
+            <span class="pv"><img src="assets/icon/yceo-mark.png" alt="" /></span> Ventes
           </button>
           <button
             class="fchip"
@@ -210,8 +210,13 @@ function hasWebGL(): boolean {
         background: #2a6fdb;
       }
       .pv {
-        background: #f39200;
+        background: #fff;
         border-radius: 50%;
+        box-shadow: inset 0 0 0 1px var(--yceo-border);
+      }
+      .pv img {
+        width: 16px;
+        height: 16px;
       }
       .jcard {
         background: var(--yceo-card);

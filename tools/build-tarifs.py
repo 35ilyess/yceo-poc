@@ -24,6 +24,9 @@ CAT = {
 
 groups = {}
 for r in raw["results"]:
+    # Pas de m-ticket dans l'app -> on exclut cette catégorie (titres identiques en sans-contact).
+    if r.get("type_de_titre") == "Ticket dématérialisé (appli YCEO, m-ticket)":
+        continue
     cat = CAT.get(r.get("type_de_titre", ""), r.get("type_de_titre") or "Autres")
     item = {
         "name": (r.get("denomination_au_1er_juillet_2026") or "").strip(),
