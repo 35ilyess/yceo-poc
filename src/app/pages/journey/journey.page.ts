@@ -215,6 +215,10 @@ type Field = 'from' | 'to';
   `,
   styles: [
     `
+      ion-toolbar {
+        border-radius: 0 0 18px 18px;
+        overflow: hidden;
+      }
       .form {
         margin: 12px 16px 0;
         display: flex;

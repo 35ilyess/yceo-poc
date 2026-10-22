@@ -80,6 +80,10 @@ import { LineBadgeComponent } from '../../shared/line-badge.component';
   `,
   styles: [
     `
+      ion-toolbar {
+        border-radius: 0 0 18px 18px;
+        overflow: hidden;
+      }
       .pad {
         padding: 4px 16px 24px;
       }
