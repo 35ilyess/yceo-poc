@@ -9,11 +9,15 @@ import {
   IonIcon,
   IonItem,
   IonLabel,
+  IonNote,
+  IonSegment,
+  IonSegmentButton,
   IonText,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { chevronForward, shieldCheckmarkOutline } from 'ionicons/icons';
 import { ConfigService } from '../../core/config.service';
+import { ThemeMode, ThemeService } from '../../core/theme.service';
 import { NfcService } from '../../core/nfc.service';
 
 @Component({
@@ -29,13 +33,28 @@ import { NfcService } from '../../core/nfc.service';
     IonIcon,
     IonItem,
     IonLabel,
+    IonNote,
+    IonSegment,
+    IonSegmentButton,
     IonText,
   ],
+  styles: [`.hint{display:block;margin:6px 2px 0;font-size:0.8rem}`],
   template: `
     <ion-header class="ion-no-border">
       <ion-toolbar><ion-title>Réglages</ion-title></ion-toolbar>
     </ion-header>
     <ion-content class="ion-padding">
+      <ion-text color="medium"><h3>Apparence</h3></ion-text>
+      <ion-segment [value]="theme.mode" (ionChange)="setTheme($any($event.detail.value))">
+        <ion-segment-button value="auto"><ion-label>Auto</ion-label></ion-segment-button>
+        <ion-segment-button value="light"><ion-label>Clair</ion-label></ion-segment-button>
+        <ion-segment-button value="dark"><ion-label>Sombre</ion-label></ion-segment-button>
+      </ion-segment>
+      <ion-note color="medium" class="hint">
+        « Auto » suit le réglage de ton téléphone.
+      </ion-note>
+
+      <hr />
       <ion-text color="medium">
         <h3>Données & calculs</h3>
         <p>
@@ -71,7 +90,12 @@ import { NfcService } from '../../core/nfc.service';
 })
 export class SettingsPage {
   cfg = inject(ConfigService);
+  theme = inject(ThemeService);
   private nfc = inject(NfcService);
+
+  setTheme(mode: ThemeMode): void {
+    this.theme.set(mode);
+  }
 
   nfcState = this.nfc.isAvailable() ? 'disponible' : 'indisponible (POC web)';
 

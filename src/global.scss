@@ -54,31 +54,40 @@
   --ion-toolbar-color: #0f2a2d;
 }
 
-/* ---- Mode sombre (prefers-color-scheme) ---- */
+/* ---- Mode sombre ---- */
+@mixin yceo-dark {
+  --yceo-ink: #e7f1f2;
+  --yceo-bg: #0e1b1d;
+  --yceo-sky-pale: #12282b;
+  --yceo-sky: #103a40;
+  --yceo-tile: #113a40;
+  --yceo-border: #24383c;
+  --yceo-muted: #9fb3b6;
+  --yceo-card: #16272b;
+  --yceo-primary-dark: #5fd3dd;
+  --yceo-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+  --yceo-shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.5);
+
+  --ion-background-color: #0e1b1d;
+  --ion-background-color-rgb: 14, 27, 29;
+  --ion-text-color: #e7f1f2;
+  --ion-text-color-rgb: 231, 241, 242;
+  --ion-toolbar-background: #16272b;
+  --ion-toolbar-color: #e7f1f2;
+  --ion-tab-bar-background: #16272b;
+  --ion-tab-bar-color: #9fb3b6;
+  --ion-item-background: #16272b;
+}
+
+/* Auto : suit le réglage système, sauf si l'utilisateur a forcé « clair ». */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --yceo-ink: #e7f1f2;
-    --yceo-bg: #0e1b1d;
-    --yceo-sky-pale: #12282b;
-    --yceo-sky: #103a40;
-    --yceo-tile: #113a40;
-    --yceo-border: #24383c;
-    --yceo-muted: #9fb3b6;
-    --yceo-card: #16272b;
-    --yceo-primary-dark: #5fd3dd;
-    --yceo-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
-    --yceo-shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.5);
-
-    --ion-background-color: #0e1b1d;
-    --ion-background-color-rgb: 14, 27, 29;
-    --ion-text-color: #e7f1f2;
-    --ion-text-color-rgb: 231, 241, 242;
-    --ion-toolbar-background: #16272b;
-    --ion-toolbar-color: #e7f1f2;
-    --ion-tab-bar-background: #16272b;
-    --ion-tab-bar-color: #9fb3b6;
-    --ion-item-background: #16272b;
+    @include yceo-dark;
   }
+}
+/* Forcé « sombre » depuis les Réglages, quel que soit le système. */
+:root[data-theme='dark'] {
+  @include yceo-dark;
 }
 
 body {
