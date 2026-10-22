@@ -1,3 +1,4 @@
+
 name: Build iOS IPA (unsigned)
 
 on:
@@ -8,18 +9,23 @@ on:
 jobs:
   build:
     runs-on: macos-15
+
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: npm
 
       - name: Installer les dépendances
-        run: npm install
+        run: npm ci
 
       - name: Build web (Angular + PWA)
         run: npm run build
+
+      - name: Générer les icônes iOS
+        run: npx capacitor-assets generate --ios
 
       - name: Générer le projet iOS
         run: |
@@ -29,10 +35,13 @@ jobs:
       - name: Ajouter les permissions (Info.plist)
         run: |
           PLIST=ios/App/App/Info.plist
+
           /usr/libexec/PlistBuddy -c "Add :NSLocationWhenInUseUsageDescription string Votre position sert à calculer un itinéraire et à trouver les arrêts proches. Elle reste sur votre appareil." "$PLIST" || true
+
           /usr/libexec/PlistBuddy -c "Add :LSApplicationQueriesSchemes array" "$PLIST" || true
           /usr/libexec/PlistBuddy -c "Add :LSApplicationQueriesSchemes:0 string comgooglemaps" "$PLIST" || true
           /usr/libexec/PlistBuddy -c "Add :LSApplicationQueriesSchemes:1 string waze" "$PLIST" || true
+
           /usr/libexec/PlistBuddy -c "Print :NSLocationWhenInUseUsageDescription" "$PLIST"
 
       - name: Compiler l'app
@@ -43,7 +52,9 @@ jobs:
             -configuration Release \
             -sdk iphoneos \
             -derivedDataPath ios/build \
-            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
             build
 
       - name: Empaqueter le .ipa
