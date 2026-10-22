@@ -167,14 +167,8 @@ export class LinesPage {
     });
   }
 
+  /** Le nom est déjà formaté par GtfsService ; on n'ajuste que le séparateur. */
   prettyName(n: string): string {
-    return (n || '')
-      .split(' - ')
-      .map((p) =>
-        p
-          .toLocaleLowerCase('fr')
-          .replace(/(^|[\s'’-])(\p{L})/gu, (_m, sep, ch) => sep + ch.toLocaleUpperCase('fr')),
-      )
-      .join(' → ');
+    return (n || '').replace(/ - /g, ' → ');
   }
 }
