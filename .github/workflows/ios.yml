@@ -24,12 +24,10 @@ jobs:
       - name: Build web (Angular + PWA)
         run: npm run build
 
-      - name: Générer les icônes iOS
-        run: npx capacitor-assets generate --ios
-
       - name: Générer le projet iOS
         run: |
           npx cap add ios
+          npx capacitor-assets generate --ios
           npx cap sync ios
 
       - name: Ajouter les permissions (Info.plist)
@@ -56,6 +54,12 @@ jobs:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
             build
+
+      - name: Vérifier les icônes compilées
+        run: |
+          /usr/libexec/PlistBuddy \
+            -c "Print :CFBundleIcons" \
+            ios/build/Build/Products/Release-iphoneos/App.app/Info.plist
 
       - name: Empaqueter le .ipa
         run: |
