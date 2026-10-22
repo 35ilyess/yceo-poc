@@ -105,7 +105,7 @@ body {
 
 /* ---- Hero d'en-tête (dégradé teal Ycéo) ---- */
 .hero {
-  background: linear-gradient(145deg, #00a7b5 0%, #005872 100%);
+  background: linear-gradient(140deg, #3bbf7a 0%, #00a7b5 42%, #005872 100%);
   color: #fff;
   /* encoche / barre d'état : padding haut sûr sur mobile natif */
   padding: calc(18px + env(safe-area-inset-top)) 18px 26px;
@@ -119,9 +119,9 @@ body {
   position: absolute;
   right: -40px;
   top: -40px;
-  width: 180px;
-  height: 180px;
-  background: radial-gradient(circle, rgba(174, 213, 0, 0.25) 0%, transparent 70%);
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(174, 213, 0, 0.42) 0%, transparent 70%);
   pointer-events: none;
 }
 .hero .eyebrow {
