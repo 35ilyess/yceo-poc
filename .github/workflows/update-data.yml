@@ -1,0 +1,72 @@
+name: Mise à jour des données (hebdo)
+
+on:
+  schedule:
+    - cron: '0 4 * * 1' # chaque lundi 04:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-data
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Télécharger le GTFS Ycéo
+        run: |
+          set -euo pipefail
+          curl -sfSL --retry 3 "https://www.data.gouv.fr/api/1/datasets/r/a1867718-7921-42a6-b672-c53b8c583aa3" -o "$RUNNER_TEMP/gtfs.zip"
+          mkdir -p "$RUNNER_TEMP/gtfs"
+          unzip -o -q "$RUNNER_TEMP/gtfs.zip" -d "$RUNNER_TEMP/gtfs"
+          DIR="$(dirname "$(find "$RUNNER_TEMP/gtfs" -name stops.txt | head -1)")"
+          test -f "$DIR/stop_times.txt"
+          echo "GTFS_DIR=$DIR" >> "$GITHUB_ENV"
+
+      - name: Régénérer horaires, itinéraire, tarifs et accessibilité (strict)
+        run: |
+          set -euo pipefail
+          rm -rf src/assets/gtfs/stop src/assets/gtfs/line
+          python3 -I tools/build-gtfs.py "$GTFS_DIR" src/assets/gtfs
+          python3 -I tools/build-router.py src/assets/gtfs
+          python3 -I tools/build-tarifs.py src/assets
+          python3 -I tools/build-pmr.py src/assets
+
+      - name: Contrôle de cohérence
+        run: |
+          python3 -I - <<'PY'
+          import json
+          stops = json.load(open("src/assets/gtfs/stops.json"))
+          lines = json.load(open("src/assets/gtfs/lines.json"))
+          router = json.load(open("src/assets/gtfs/router.json"))
+          print(f"arrêts={len(stops)} lignes={len(lines)} connexions={len(router['c'])//5}")
+          assert len(stops) > 1000 and len(lines) > 100, "flux GTFS anormalement réduit"
+          assert len(router["c"]) // 5 > 50000, "graphe d'itinéraire anormalement réduit"
+          PY
+
+      - name: Trafic et parkings (au mieux, l'ancienne version est conservée en cas d'échec)
+        run: |
+          python3 -I tools/build-trafic.py src/assets || echo "::warning::trafic non mis à jour"
+          python3 -I tools/build-services.py src/assets || echo "::warning::parkings non mis à jour"
+
+      - name: Commiter si changement
+        run: |
+          git config user.name "yceo-data-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A src/assets
+          if git diff --cached --quiet; then
+            echo "Aucun changement."
+          else
+            git diff --cached --stat | tail -5
+            git commit -m "Données : mise à jour automatique $(date -u +%F)"
+            git push
+          fi
